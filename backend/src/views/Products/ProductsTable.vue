@@ -67,6 +67,7 @@
                         :sort-direction="sortDirection"
                         >Last Updated At</TableHeaderCell
                     >
+                    <TableHeaderCell> Actions </TableHeaderCell>
                 </tr>
             </thead>
             <tbody v-if="products.loading">
@@ -97,10 +98,112 @@
                     <td class="border-b p-2">
                         {{ product.updated_at }}
                     </td>
+                    <td class="border-b p-2">
+                        <Menu as="div" class="relative inline-block text-left">
+                            <div>
+                                <MenuButton
+                                    class="inline-flex items-center w-full justify-center rounded-full h-10 bg-black bg-opacity-0 text-sm font-medium text-white hover:bg-opacity-5 focus:bg-opacity-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75"
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke-width="1.5"
+                                        stroke="currentColor"
+                                        class="h-5 w-5 text-indigo-500"
+                                        aria-hidden="true"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"
+                                        />
+                                    </svg>
+                                </MenuButton>
+                            </div>
+                            <transition
+                                enter-active-class="transition duration-100 ease-out"
+                                enter-from-class="transform scale-95 opacity-0"
+                                enter-to-class="transform scale-100 opacity-100"
+                                leave-active-class="transition duration-75 ease-in"
+                                leave-from-class="transform scale-100 opacity-100"
+                                leave-to-class="transform scale-95 opacity-0"
+                            >
+                                <MenuItems
+                                    class="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none"
+                                >
+                                    <div class="px-1 py-1">
+                                        <MenuItem v-slot="{ active }">
+                                            <button
+                                                :class="[
+                                                    active
+                                                        ? 'bg-indigo-600 text-white'
+                                                        : 'text-gray-900',
+                                                    'group flex w-full items-center rounded-md px-2 py-2 text-sm',
+                                                ]"
+                                            >
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    stroke-width="1.5"
+                                                    stroke="currentColor"
+                                                    :active="active"
+                                                    class="mr-2 h-5 w-5 text-indigo-400"
+                                                    aria-hidden="true"
+                                                >
+                                                    <path
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125"
+                                                    />
+                                                </svg>
+
+                                                Edit
+                                            </button>
+                                        </MenuItem>
+                                        <MenuItem v-slot="{ active }">
+                                            <button
+                                                :class="[
+                                                    active
+                                                        ? 'bg-indigo-600 text-white'
+                                                        : 'text-gray-900',
+                                                    'group flex w-full items-center rounded-md px-2 py-2 text-sm',
+                                                ]"
+                                                @click="deleteProduct(product)"
+                                            >
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    stroke-width="1.5"
+                                                    stroke="currentColor"
+                                                    :active="active"
+                                                    class="mr-2 h-5 w-5 text-indigo-400"
+                                                    aria-hidden="true"
+                                                >
+                                                    <path
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+                                                    />
+                                                </svg>
+
+                                                Delete
+                                            </button>
+                                        </MenuItem>
+                                    </div>
+                                </MenuItems>
+                            </transition>
+                        </Menu>
+                    </td>
                 </tr>
             </tbody>
         </table>
-        <div v-if="!products.loading" class="flex justify-between items-center mt-5">
+        <div
+            v-if="!products.loading"
+            class="flex justify-between items-center mt-5"
+        >
             <span> Showing from {{ products.from }} to {{ products.to }} </span>
             <nav
                 v-if="products.total > products.limit"
@@ -136,6 +239,8 @@ import { computed, onMounted, ref } from "vue";
 import store from "../../store";
 import { PRODUCTS_PER_PAGE } from "../../constants";
 import TableHeaderCell from "../../components/core/Table/TableHeaderCell.vue";
+import { Menu, MenuButton, MenuItems, MenuItem } from "@headlessui/vue";
+import { ChevronDownIcon } from "@heroicons/vue/20/solid";
 
 const perPage = ref(PRODUCTS_PER_PAGE);
 const search = ref("");
@@ -177,6 +282,15 @@ function sortProduct(field) {
         sortDirection.value = "asc";
     }
     getProducts();
+}
+
+function deleteProduct(product) {
+    if (!confirm(`Are you sure you want to delete the product?`)) {
+        return;
+    }
+    store.dispatch("deleteProduct", product.id).then((res) => {
+        store.dispatch("getProducts");
+    });
 }
 </script>
 
