@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-white p-4 rounded-lg shadow">
+    <div class="bg-white p-4 rounded-lg shadow animate-fade-in-down">
         <div class="flex justify-between border-b-2 pb-3">
             <div class="flex items-center">
                 <span class="whitespace-nowrap mr-3">Per Page</span>
@@ -8,7 +8,7 @@
                     v-model="perPage"
                     class="appearance-none relative block w-24 px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 >
-                    <option value="5">5</option>
+                    <option value="5">5</option>	
                     <option value="10">10</option>
                     <option value="20">20</option>
                     <option value="50">50</option>
@@ -72,18 +72,18 @@
             </thead>
             <tbody v-if="products.loading">
                 <tr>
-                    <td colspan="5">
+                    <td colspan="6">
                         <Spinner class="my-4" v-if="products.loading" />
                     </td>
                 </tr>
             </tbody>
             <tbody v-else>
-                <tr v-for="product of products.data">
+                <tr v-for="(product, index) of products.data" >
                     <td class="border-b p-2">{{ product.id }}</td>
                     <td class="border-b p-2">
                         <img
                             class="w-16"
-                            :src="product.image"
+                            :src="product.image_url"
                             :alt="product.title"
                         />
                     </td>
@@ -141,6 +141,8 @@
                                                         : 'text-gray-900',
                                                     'group flex w-full items-center rounded-md px-2 py-2 text-sm',
                                                 ]"
+
+                                                @click="editProduct(product)"
                                             >
                                                 <svg
                                                     xmlns="http://www.w3.org/2000/svg"
@@ -242,6 +244,7 @@ import TableHeaderCell from "../../components/core/Table/TableHeaderCell.vue";
 import { Menu, MenuButton, MenuItems, MenuItem } from "@headlessui/vue";
 import { ChevronDownIcon } from "@heroicons/vue/20/solid";
 
+const emit = defineEmits(['clickEdit']);
 const perPage = ref(PRODUCTS_PER_PAGE);
 const search = ref("");
 const products = computed(() => store.state.products);
@@ -282,6 +285,10 @@ function sortProduct(field) {
         sortDirection.value = "asc";
     }
     getProducts();
+}
+
+function editProduct(product) {
+    emit('clickEdit', product)
 }
 
 function deleteProduct(product) {
